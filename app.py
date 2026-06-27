@@ -325,6 +325,9 @@ def admin_signup():
     session['pending_admin'] = {'name': name, 'email': email, 'otp': otp}
 
     if not send_otp_email(email, otp):
+        if config.OTP_FALLBACK_ENABLED:
+            flash(f'Email could not be sent. Demo OTP: {otp}', 'warning')
+            return render_template('admin/verify_otp.html')
         flash('Could not send OTP email. Please try again later.', 'danger')
         return redirect('/admin-signup')
 
