@@ -33,3 +33,8 @@ RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'static/upload')
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file upload
+
+# Superadmin bootstrap
+SUPERADMIN_NAME = os.getenv('SUPERADMIN_NAME', 'Owner')
+SUPERADMIN_EMAIL = os.getenv('SUPERADMIN_EMAIL', '')
+SUPERADMIN_PASSWORD = os.getenv('SUPERADMIN_PASSWORD', '')

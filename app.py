@@ -241,6 +241,45 @@ def ensure_superadmin_table():
     conn.close()
 
 
+def ensure_bootstrap_superadmin():
+    """Create or update the bootstrap superadmin from environment variables."""
+    if not config.SUPERADMIN_EMAIL or not config.SUPERADMIN_PASSWORD:
+        return False, "Superadmin environment variables are not configured."
+
+    ensure_superadmin_table()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM superadmin WHERE LOWER(email)=LOWER(?)', (config.SUPERADMIN_EMAIL.lower(),))
+    existing_admin = cursor.fetchone()
+
+    if existing_admin is None:
+        cursor.execute(
+            """
+            INSERT INTO superadmin (name, email, password, status)
+            VALUES (?, ?, ?, 'approved')
+            """,
+            (config.SUPERADMIN_NAME, config.SUPERADMIN_EMAIL, config.SUPERADMIN_PASSWORD)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True, "Superadmin account created successfully."
+
+    cursor.execute(
+        """
+        UPDATE superadmin
+        SET name = ?, password = ?, status = 'approved'
+        WHERE LOWER(email)=LOWER(?)
+        """,
+        (config.SUPERADMIN_NAME, config.SUPERADMIN_PASSWORD, config.SUPERADMIN_EMAIL.lower())
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return True, "Superadmin account updated successfully."
+
+
 def send_otp_email(email, otp):
     if not config.MAIL_ENABLED:
         app.logger.warning("OTP email skipped because MAIL_ENABLED is false.")
@@ -500,6 +539,13 @@ def superadmin_login():
     session.pop('_flashes', None)
     flash('Welcome, Super Admin!', 'success')
     return redirect('/superadmin/dashboard')
+
+
+@app.route('/setup-superadmin')
+def setup_superadmin():
+    ok, message = ensure_bootstrap_superadmin()
+    flash(message, 'success' if ok else 'danger')
+    return redirect('/superadmin-login')
 
 
 # ============================================================
