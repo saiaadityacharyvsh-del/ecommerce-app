@@ -1632,27 +1632,6 @@ def user_checkout():
             flash("Address deleted.", "success")
             return redirect('/user/checkout')
 
-
-# ============================================================
-# APP STARTUP
-# ============================================================
-
-if __name__ == '__main__':
-    # Initialize database
-    initialize_database()
-    
-    # Create upload folders if they don't exist
-    os.makedirs(os.path.join('static', 'upload', 'product_images'), exist_ok=True)
-    os.makedirs(os.path.join('static', 'upload', 'profile_pics'), exist_ok=True)
-    
-    # Run app
-    debug_mode = config.DEBUG
-    app.run(
-        host='0.0.0.0',
-        port=int(os.getenv('PORT', 5000)),
-        debug=debug_mode
-    )
-
     selected_ids = session.get('checkout_items', [])
     if not selected_ids:
         flash("Please select at least one product from your cart before checkout.", "danger")
@@ -2108,7 +2087,14 @@ def setup_products_fk():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    initialize_database()
+    os.makedirs(os.path.join('static', 'upload', 'product_images'), exist_ok=True)
+    os.makedirs(os.path.join('static', 'upload', 'profile_pics'), exist_ok=True)
+    app.run(
+        host='0.0.0.0',
+        port=int(os.getenv('PORT', 5000)),
+        debug=config.DEBUG
+    )
 
 
 
