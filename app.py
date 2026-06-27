@@ -33,6 +33,7 @@ app.config.update(
     MAIL_USE_TLS=config.MAIL_USE_TLS,
     MAIL_USERNAME=config.MAIL_USERNAME,
     MAIL_PASSWORD=config.MAIL_PASSWORD,
+    MAIL_TIMEOUT=config.MAIL_TIMEOUT,
 )
 
 mail = Mail(app)
@@ -241,6 +242,10 @@ def ensure_superadmin_table():
 
 
 def send_otp_email(email, otp):
+    if not config.MAIL_USERNAME or not config.MAIL_PASSWORD:
+        app.logger.warning("OTP email skipped because SMTP credentials are missing.")
+        return False
+
     subject = 'Admin Registration OTP'
     body = f'Your verification OTP is: {otp}\n\nIf you did not request this, please ignore this message.'
 
@@ -250,6 +255,7 @@ def send_otp_email(email, otp):
         mail.send(message)
         return True
     except Exception as exc:
+        app.logger.exception("Failed to send OTP email to %s", email)
         return False
 
 
