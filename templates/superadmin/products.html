@@ -1,0 +1,65 @@
+{% extends "superadmin/base.html" %}
+{% block title %}All Products - Super Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0">All Products</h3>
+        <p class="text-muted mb-0">Global view across every admin on the platform</p>
+    </div>
+    <span class="badge bg-success px-3 py-2">{{ products|length }} products</span>
+</div>
+
+<div class="sa-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="sa-table">
+                <tr>
+                    <th style="width: 70px">Image</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Owner Admin</th>
+                    <th class="text-end" style="width: 160px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>
+                        <img src="{{ url_for('static', filename='upload/product_images/' + p.image) }}" 
+                             style="width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid #eee" alt="">
+                    </td>
+                    <td>
+                        <strong>{{ p.name }}</strong><br>
+                        <small class="text-muted">{{ p.description[:70] }}...</small>
+                    </td>
+                    <td><span class="badge bg-secondary">{{ p.category }}</span></td>
+                    <td><strong>₹{{ p.price }}</strong></td>
+                    <td>
+                        {% if p.admin_name %}
+                            <strong class="text-success">{{ p.admin_name }}</strong><br>
+                            <small class="text-muted">{{ p.admin_email }}</small>
+                        {% else %}
+                            <span class="text-danger">Unassigned (legacy)</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="/admin/view-item/{{ p.product_id }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+                        <a href="/superadmin/products/delete/{{ p.product_id }}" 
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Delete this product permanently?');">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center py-5 text-muted">No products on the platform.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

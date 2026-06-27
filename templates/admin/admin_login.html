@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Admin Login - MyShop{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-5">
+
+    <div class="card card-soft shadow-sm p-4">
+      <h1 class="h4 mb-3">Admin Login</h1>
+      <form method="POST" action="/admin-login" class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </div>
+      </form>
+      <div class="mt-3 text-center">
+        <a href="/forgot-password" class="d-block mb-2">Forgot Password?</a>
+        <span class="text-muted">Don't have an account?</span>
+        <a href="/admin-signup">Register here</a>
+      </div>
+      <div class="mt-2 text-center">
+        <a href="/user-login">User Login →</a>
+      </div>
+
+      <!-- Super Admin Login Link -->
+      <div class="mt-3 pt-3 border-top text-center">
+        <a href="/superadmin-login" class="btn btn-outline-danger btn-sm">
+          🔒 Super Admin Login (Owner Only)
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}My Profile - MyShop{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card card-soft shadow p-4">
+      <!-- Header with Photo -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+          {% if profile_pic %}
+            <img src="{{ url_for('static', filename='upload/profile_pics/' + profile_pic) }}" 
+                 class="rounded-circle me-3" style="width: 72px; height: 72px; object-fit: cover; border: 3px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="Your Profile Photo">
+          {% else %}
+            <div class="user-avatar-lg me-3" style="font-size: 2rem;">{{ user_name[0].upper() }}</div>
+          {% endif %}
+          <div>
+            <h2 class="h4 mb-0 fw-bold">{{ user_name }}</h2>
+            <p class="text-muted mb-0">Your account details</p>
+          </div>
+        </div>
+        <a href="/user/products" class="btn btn-outline-secondary btn-sm">Back to Shop</a>
+      </div>
+
+      <!-- Profile Photo Upload -->
+      <div class="mb-4 p-3 bg-light rounded-3">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+          <div class="flex-grow-1">
+            <label class="form-label fw-semibold small mb-1 d-block">
+              <i class="bi bi-camera me-1"></i> Profile Photo
+            </label>
+            <form method="POST" enctype="multipart/form-data" class="d-flex flex-wrap align-items-center gap-2">
+              <input type="file" name="profile_pic" accept="image/png,image/jpeg,image/jpg,image/gif" 
+                     class="form-control form-control-sm" style="max-width: 260px;" required>
+              <button type="submit" class="btn btn-success btn-sm px-3">
+                <i class="bi bi-upload me-1"></i> Upload
+              </button>
+            </form>
+            <div class="text-muted mt-1" style="font-size: 0.75rem;">
+              JPG, PNG, GIF • Max 5MB recommended
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Info Grid -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3">
+            <div class="text-muted small mb-1"><i class="bi bi-person me-1"></i> FULL NAME</div>
+            <div class="fs-5 fw-semibold">{{ user_name }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3">
+            <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i> EMAIL</div>
+            <div class="fs-5 fw-semibold text-break">{{ user_email }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3">
+            <div class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i> MOBILE</div>
+            <div class="fs-5 fw-semibold">{{ mobile }}</div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="p-3 bg-light rounded-3">
+            <div class="text-muted small mb-1"><i class="bi bi-geo-alt me-1"></i> SHIPPING ADDRESS</div>
+            <div class="fs-5">{{ address }}</div>
+            {% if not has_address %}
+            <div class="mt-2">
+              <small class="text-muted">Add addresses during checkout for faster shopping.</small>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit button: form opens only when clicked -->
+      <div class="text-end mb-2">
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleEditForm()">
+          <i class="bi bi-pencil-square me-1"></i> Edit Details
+        </button>
+      </div>
+
+      <div id="editSection" class="d-none">
+        <hr class="my-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-pencil-square me-1"></i>Edit Profile Details</h6>
+        <form method="POST" class="row g-3">
+          <input type="hidden" name="action" value="update_profile">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Full Name</label>
+            <input type="text" name="name" class="form-control" value="{{ user_name }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Email Address</label>
+            <input type="email" name="email" class="form-control" value="{{ user_email }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Mobile Number</label>
+            <input type="tel" name="phone" class="form-control" value="{{ user_phone or '' }}" placeholder="98765 43210">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle me-1"></i> Save Changes
+            </button>
+            <small class="text-muted ms-2">Changes apply to your account immediately.</small>
+          </div>
+        </form>
+      </div>
+
+      <div class="mt-4 d-flex flex-wrap gap-3">
+        <a href="/user/my-orders" class="btn btn-primary px-4">
+          <i class="bi bi-box-seam me-2"></i> My Orders
+        </a>
+        <a href="/user/cart" class="btn btn-outline-primary px-4">
+          <i class="bi bi-cart me-2"></i> Go to Cart
+        </a>
+        <a href="/user-logout" class="btn btn-outline-danger px-4">
+          <i class="bi bi-box-arrow-right me-2"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <div class="text-center mt-3 text-muted small">
+      Click "Edit Details" to change name, email or mobile. Shipping address from checkout.
+    </div>
+
+    <script>
+      function toggleEditForm() {
+        const section = document.getElementById('editSection');
+        if (section) {
+          section.classList.toggle('d-none');
+        }
+      }
+    </script>
+  </div>
+</div>
+{% endblock %}

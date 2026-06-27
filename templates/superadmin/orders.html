@@ -1,0 +1,77 @@
+{% extends "superadmin/base.html" %}
+{% block title %}All Orders - Super Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0">Platform Orders</h3>
+        <p class="text-muted">Monitor every order placed across the marketplace</p>
+    </div>
+    <span class="badge bg-warning text-dark px-3 py-2">{{ orders|length }} orders</span>
+</div>
+
+<div class="sa-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>#ID</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td><strong>#{{ o.order_id }}</strong></td>
+                    <td>
+                        {% if o.user_name %}
+                            {{ o.user_name }}<br>
+                            <small class="text-muted">{{ o.user_email }}</small>
+                        {% else %}
+                            <span class="text-danger">Deleted user</span>
+                        {% endif %}
+                    </td>
+                    <td><strong>₹{{ o.amount }}</strong></td>
+                    <td>
+                        {% if o.payment_status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ o.payment_status or 'Pending' }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if o.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif o.status == 'shipped' %}
+                            <span class="badge bg-primary">Shipped</span>
+                        {% elif o.status == 'delivered' %}
+                            <span class="badge bg-success">Delivered</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ o.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td><small>{{ o.created_at or 'N/A' }}</small></td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="/superadmin/orders/status/{{ o.order_id }}/shipped" class="btn btn-outline-primary">Ship</a>
+                            <a href="/superadmin/orders/status/{{ o.order_id }}/delivered" class="btn btn-outline-success">Deliver</a>
+                            <a href="/superadmin/orders/status/{{ o.order_id }}/cancelled" class="btn btn-outline-danger"
+                               onclick="return confirm('Cancel this order?');">Cancel</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center py-5 text-muted">No orders yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<p class="small text-muted mt-2">Super Admin can override order status for any order on the platform.</p>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Select Shipping Address - MyShop{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-10">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4">
+      <div>
+        <h1 class="h3 mb-1">Select Shipping Address</h1>
+        <p class="text-muted mb-0">Choose an address for your selected products and continue to payment.</p>
+      </div>
+      <a class="btn btn-outline-secondary" href="/user/cart">Back to Cart</a>
+    </div>
+
+    {% if selected_cart %}
+      <div class="card card-soft p-3 mb-4">
+        <h5 class="mb-3">Selected Products</h5>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Product</th>
+                <th>Name</th>
+                <th>Qty</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pid, item in selected_cart.items() %}
+              <tr>
+                <td><img src="{{ url_for('static', filename='upload/product_images/' ~ item.image) }}" class="rounded-3" width="80" alt="{{ item.name }}"></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price * item.quantity }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="text-end mt-3">
+          <span class="fw-semibold">Selected Products Total: ₹{{ selected_total }}</span>
+        </div>
+      </div>
+    {% else %}
+      <div class="alert alert-warning">No products selected for checkout. Please select items in your cart first.</div>
+    {% endif %}
+
+    <div class="row g-4">
+      <div class="col-xl-6">
+        <div class="card card-soft shadow-sm p-4">
+          <h5 class="mb-3">Saved Addresses</h5>
+          {% if addresses %}
+            <form method="POST" action="{{ url_for('user_checkout') }}">
+              <input type="hidden" name="action" value="use_address">
+               {% for address in addresses %}
+               <div class="card mb-3 p-3">
+                 <div class="form-check">
+                   <input class="form-check-input" type="radio" name="selected_address" id="address-{{ address.id }}" value="{{ address.id }}" {% if loop.first %}checked{% endif %}>
+                   <label class="form-check-label fw-semibold" for="address-{{ address.id }}">{{ address.name }} | {{ address.phone }}</label>
+                 </div>
+                 <p class="mb-2 mt-2 text-muted">
+                   {{ address.address|default('') }}{% if address.landmark %}, {{ address.landmark }}{% endif %}{% if address.city %}, {{ address.city }}{% endif %}{% if address.district %}, {{ address.district }}{% endif %}{% if address.state %}, {{ address.state }}{% endif %}{% if address.pincode %} - {{ address.pincode }}{% endif %}{% if address.country %}, {{ address.country }}{% endif %}
+                 </p>
+
+                 <div class="d-flex gap-2 mt-2">
+                   <a href="{{ url_for('user_checkout', edit=address.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                   <a href="{{ url_for('user_checkout', delete=address.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this address?');">Delete</a>
+                 </div>
+               </div>
+               {% endfor %}
+
+               <button type="submit" name="action" value="use_address" class="btn btn-primary w-100">Use Selected Address</button>
+             </form>
+
+
+           {% else %}
+             <div class="alert alert-info">No saved addresses yet. Add a new address below.</div>
+           {% endif %}
+
+           {% if editing_address %}
+           <div class="card card-soft shadow-sm p-4 mt-4">
+             <h5 class="mb-3">Edit Address</h5>
+             <form method="POST" action="{{ url_for('user_checkout') }}">
+               <input type="hidden" name="action" value="save_edit_address">
+               <input type="hidden" name="address_id" value="{{ editing_address.id }}">
+               <div class="mb-3">
+                 <label class="form-label">Full Name*</label>
+                 <input type="text" name="full_name" class="form-control" value="{{ editing_address.name }}" required>
+               </div>
+               <div class="mb-3">
+                 <label class="form-label">Phone Number*</label>
+                 <input type="text" name="phone" class="form-control" value="{{ editing_address.phone }}" required>
+               </div>
+               <div class="mb-3">
+                 <label class="form-label">Address*</label>
+                 <textarea name="address" rows="3" class="form-control" required>{{ editing_address.address }}</textarea>
+               </div>
+               <div class="row g-3 mb-3">
+                 <div class="col-md-6">
+                   <label class="form-label">Landmark*</label>
+                   <input type="text" name="landmark" class="form-control" value="{{ editing_address.landmark }}" required>
+                 </div>
+                 <div class="col-md-6">
+                   <label class="form-label">City*</label>
+                   <input type="text" name="city" class="form-control" value="{{ editing_address.city }}" required>
+                 </div>
+               </div>
+               <div class="row g-3 mb-3">
+                 <div class="col-md-6">
+                   <label class="form-label">District*</label>
+                   <input type="text" name="district" class="form-control" value="{{ editing_address.district }}" required>
+                 </div>
+                 <div class="col-md-6">
+                   <label class="form-label">State*</label>
+                   <input type="text" name="state" class="form-control" value="{{ editing_address.state }}" required>
+                 </div>
+               </div>
+               <div class="row g-3 mb-3">
+                 <div class="col-md-6">
+                   <label class="form-label">Country</label>
+                   <input type="text" name="country" class="form-control" value="{{ editing_address.country }}">
+                 </div>
+                 <div class="col-md-6">
+                   <label class="form-label">Pincode*</label>
+                   <input type="text" name="pincode" class="form-control" value="{{ editing_address.pincode }}" required>
+                 </div>
+               </div>
+               <div class="d-flex gap-2">
+                 <button type="submit" class="btn btn-success">Save Changes</button>
+                 <a href="{{ url_for('user_checkout') }}" class="btn btn-secondary">Cancel</a>
+               </div>
+             </form>
+           </div>
+           {% endif %}
+        </div>
+      </div>
+      <div class="col-xl-6">
+        <div class="card card-soft shadow-sm p-4">
+          <h5 class="mb-3">Add New Address</h5>
+          <form method="POST" action="{{ url_for('user_checkout') }}">
+            <input type="hidden" name="action" value="add_address">
+            <div class="mb-3">
+              <label class="form-label">Full Name*</label>
+              <input type="text" name="full_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Phone Number*</label>
+              <input type="text" name="phone" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Address*</label>
+              <textarea name="address" rows="3" class="form-control" required></textarea>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Landmark*</label>
+                <input type="text" name="landmark" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City*</label>
+                <input type="text" name="city" class="form-control" required>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">District*</label>
+                <input type="text" name="district" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">State*</label>
+                <input type="text" name="state" class="form-control" required>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Country</label>
+                <input type="text" name="country" class="form-control" value="India">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Pincode*</label>
+                <input type="text" name="pincode" class="form-control" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Save New Address & Continue</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

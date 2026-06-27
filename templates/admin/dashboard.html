@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - MyShop{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-10">
+    <div class="card card-soft shadow-sm p-4">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+        <div>
+          <h1 class="h4 mb-1">Welcome, {{ admin_name }}</h1>
+          <p class="text-muted mb-0">Manage your inventory and monitor orders from your dashboard.</p>
+        </div>
+        <a class="btn btn-outline-danger" href="/admin/logout">Logout</a>
+      </div>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <div class="card card-soft h-100 p-3">
+            <h2 class="h5">Add Product</h2>
+            <p class="text-muted mb-3">Create new catalog entries quickly.</p>
+            <a class="btn btn-primary" href="/admin/add-item">Add New Product</a>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card card-soft h-100 p-3">
+            <h2 class="h5">Product List</h2>
+            <p class="text-muted mb-3">View and manage all existing products.</p>
+            <a class="btn btn-secondary" href="/admin/item-list">View All Products</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

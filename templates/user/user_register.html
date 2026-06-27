@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}User Registration - MyShop{% endblock %}
+{% block content %}
+<div class="row g-0 shadow-lg rounded-4 overflow-hidden" style="max-width: 960px; margin: 0 auto;">
+
+  <!-- Left: Gradient Welcome Panel -->
+  <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center text-white" 
+       style="background: linear-gradient(135deg, #6610f2, #0d6efd); padding: 3rem;">
+    <div class="text-center">
+      <h2 class="fw-bold mb-3">Join MyShop Today</h2>
+      <p class="mb-4 opacity-75">Create your account and unlock exclusive deals, fast checkout &amp; more.</p>
+      <div class="fs-1">✨</div>
+    </div>
+  </div>
+
+  <!-- Right: Registration Form -->
+  <div class="col-lg-7 bg-white p-5">
+    <div class="mb-4">
+      <h1 class="h4 fw-bold mb-1">Create Your Account</h1>
+      <p class="text-muted small">Start shopping in seconds</p>
+    </div>
+
+    <form method="POST" action="/user-register" class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-medium">Full Name</label>
+        <input type="text" name="name" class="form-control form-control-lg" placeholder="John Doe" required>
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-medium">Email Address</label>
+        <input type="email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required>
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-medium">Password</label>
+        <input type="password" name="password" class="form-control form-control-lg" placeholder="Create a strong password" required>
+      </div>
+      <div class="col-12 mt-2">
+        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-semibold">Create Account</button>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <span class="text-muted">Already have an account?</span>
+      <a href="/user-login" class="fw-semibold text-decoration-none">Login now</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

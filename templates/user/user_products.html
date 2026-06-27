@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Shop Products - MyShop{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">All Products</h1>
+    <p class="text-muted mb-0">Browse, filter, and add items to your cart with ease.</p>
+  </div>
+  <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto">
+    <a class="btn btn-outline-primary" href="/user/cart">View Cart</a>
+  </div>
+</div>
+
+<!-- Search and Filter Bars (on top as requested) -->
+<!-- Unified Search + Filter Bar -->
+<form method="GET" action="/user/products" class="mb-4">
+  <div class="d-flex flex-column flex-md-row shadow-sm rounded-pill overflow-hidden border bg-white" style="border: 1px solid #dee2e6;">
+    
+    <!-- Filter (comes first) -->
+    <div class="d-flex align-items-center px-3 py-2" style="border-right: 1px solid #dee2e6; min-width: 230px; background: #f8f9fa;">
+      <i class="bi bi-funnel text-secondary me-2"></i>
+      <select name="category" class="form-select border-0 bg-transparent shadow-none py-1" style="font-size: 0.95rem;">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.category }}" {% if request.args.get('category') == cat.category %} selected {% endif %}>{{ cat.category }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Search -->
+    <div class="flex-grow-1 d-flex align-items-center px-3 py-2">
+      <i class="bi bi-search text-primary me-2"></i>
+      <input type="text" name="search" class="form-control border-0 shadow-none bg-transparent py-1" 
+             placeholder="Search products..." value="{{ request.args.get('search', '') }}" style="font-size: 0.95rem;">
+    </div>
+
+    <!-- Search Button -->
+    <div class="d-flex align-items-center p-1">
+      <button type="submit" class="btn btn-primary px-4 fw-semibold rounded-pill">
+        Search
+      </button>
+    </div>
+  </div>
+</form>
+
+<!-- Right-to-Left Auto-Scrolling Trending Products -->
+{% if products %}
+<div class="mb-4">
+  <div class="d-flex align-items-center justify-content-between mb-2 px-1">
+    <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+      🔥 Trending Now 
+      <span class="badge bg-danger-subtle text-danger px-2 py-1 rounded-pill fs-7">LIVE</span>
+    </h5>
+    <small class="text-muted d-none d-md-block">Hover to pause • Scrolls right to left</small>
+  </div>
+
+  <div class="trending-marquee">
+    <div class="trending-track">
+      {% for product in products[:8] %}
+      <a href="/user/product/{{ product.product_id }}" class="text-decoration-none text-dark">
+        <div class="marquee-card">
+          <img src="{{ url_for('static', filename='upload/product_images/' ~ product.image) }}" alt="{{ product.name }}">
+          <div class="marquee-body">
+            <div class="fw-semibold small text-truncate">{{ product.name }}</div>
+            <div class="marquee-price">₹{{ "%.0f"|format(product.price) }}</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+
+      <!-- Duplicate for seamless infinite scroll -->
+      {% for product in products[:8] %}
+      <a href="/user/product/{{ product.product_id }}" class="text-decoration-none text-dark">
+        <div class="marquee-card">
+          <img src="{{ url_for('static', filename='upload/product_images/' ~ product.image) }}" alt="{{ product.name }}">
+          <div class="marquee-body">
+            <div class="fw-semibold small text-truncate">{{ product.name }}</div>
+            <div class="marquee-price">₹{{ "%.0f"|format(product.price) }}</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+  {% for product in products %}
+  <div class="col">
+    <div class="card product-card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="position-relative">
+        <img src="{{ url_for('static', filename='upload/product_images/' ~ product.image) }}" class="card-img-top" alt="{{ product.name }}" style="height: 240px; object-fit: cover;">
+        <div class="position-absolute top-0 end-0 m-3">
+          <span class="badge bg-primary px-3 py-2 rounded-pill">₹{{ product.price }}</span>
+        </div>
+      </div>
+      <div class="card-body d-flex flex-column p-4">
+        <h5 class="card-title fw-bold mb-1">{{ product.name }}</h5>
+        <p class="text-muted small mb-3">{{ product.category }}</p>
+        <div class="mt-auto d-flex gap-1 flex-nowrap">
+          <a href="/user/product/{{ product.product_id }}" class="btn btn-outline-secondary btn-sm flex-fill py-1" style="font-size:0.72rem;white-space:nowrap">View</a>
+          <a href="/user/add-to-cart/{{ product.product_id }}" class="btn btn-primary btn-sm flex-fill py-1" style="font-size:0.72rem;white-space:nowrap">🛒 Add</a>
+          <a href="/user/add-to-cart/{{ product.product_id }}?buy=1" class="btn btn-success btn-sm flex-fill py-1" style="font-size:0.72rem;white-space:nowrap">Buy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12">
+    <div class="alert alert-warning rounded-4">No products found. Try a different search term or category.</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

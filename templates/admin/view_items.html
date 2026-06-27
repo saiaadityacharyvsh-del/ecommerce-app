@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Product Details - Admin{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card card-soft shadow-sm p-4">
+      <div class="row g-4 align-items-center">
+        <div class="col-md-5">
+          <img src="{{ url_for('static', filename='upload/product_images/' ~ product.image) }}" class="img-fluid rounded-4" alt="{{ product.name }}">
+        </div>
+        <div class="col-md-7">
+          <h1 class="h4 mb-3">{{ product.name }}</h1>
+          <p class="text-muted mb-3">{{ product.description }}</p>
+          <ul class="list-unstyled mb-4">
+            <li><strong>Category:</strong> {{ product.category }}</li>
+            <li><strong>Price:</strong> ₹{{ product.price }}</li>
+          </ul>
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-primary" href="/admin/item-list">Back to List</a>
+            <a class="btn btn-outline-secondary" href="/admin/update-item/{{ product.product_id }}">Edit Product</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

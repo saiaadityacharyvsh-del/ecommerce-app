@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Welcome - MyShop{% endblock %}
+{% block content %}
+
+<!-- Beautiful Hero Banner -->
+<div class="rounded-4 overflow-hidden shadow-lg mb-4 position-relative" 
+     style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); height: 320px;">
+  <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" 
+       style="background: rgba(0,0,0,0.25);">
+    <div class="container text-white">
+      <div class="row">
+        <div class="col-lg-7">
+          <h1 class="display-5 fw-bold mb-3">Welcome back, {{ user_name }}! 👋</h1>
+          <p class="lead mb-4 opacity-90">Discover amazing products, enjoy fast checkout, and shop with confidence.</p>
+          <a href="/user/products" class="btn btn-light btn-lg px-5 py-3 fw-semibold rounded-pill shadow-sm">
+            Start Shopping →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card card-soft h-100 p-4 text-center">
+      <div class="fs-1 mb-3">🛒</div>
+      <h5 class="fw-semibold">Browse Products</h5>
+      <p class="text-muted small">Explore our latest collection</p>
+      <a href="/user/products" class="btn btn-primary mt-2 w-100">Shop Now</a>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-soft h-100 p-4 text-center">
+      <div class="fs-1 mb-3">🛍️</div>
+      <h5 class="fw-semibold">Your Cart</h5>
+      <p class="text-muted small">Review items before checkout</p>
+      <a href="/user/cart" class="btn btn-outline-primary mt-2 w-100">View Cart</a>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-soft h-100 p-4 text-center">
+      <div class="fs-1 mb-3">📦</div>
+      <h5 class="fw-semibold">My Orders</h5>
+      <p class="text-muted small">Track your previous purchases</p>
+      <a href="/user/my-orders" class="btn btn-outline-secondary mt-2 w-100">View Orders</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

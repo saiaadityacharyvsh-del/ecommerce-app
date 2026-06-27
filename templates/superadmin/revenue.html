@@ -1,0 +1,79 @@
+{% extends "superadmin/base.html" %}
+{% block title %}Revenue Reports - Super Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0">Revenue &amp; Analytics</h3>
+        <p class="text-muted">Global financial overview of the platform</p>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="icon bg-primary text-white"><i class="bi bi-receipt"></i></div>
+            <div class="text-muted">Total Orders</div>
+            <div class="display-6 fw-bold">{{ totals.total_orders or 0 }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="icon bg-success text-white"><i class="bi bi-currency-rupee"></i></div>
+            <div class="text-muted">Total Revenue (All Time)</div>
+            <div class="display-6 fw-bold">₹{{ "{:,.0f}".format(totals.total_revenue or 0) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="icon bg-info text-white"><i class="bi bi-check2-circle"></i></div>
+            <div class="text-muted">Paid Revenue</div>
+            <div class="display-6 fw-bold">₹{{ "{:,.0f}".format(totals.paid_revenue or 0) }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Per Admin Breakdown -->
+<div class="sa-card">
+    <div class="card-header bg-transparent border-0 pt-3 px-3">
+        <strong>Revenue by Admin (from paid orders)</strong>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Admin</th>
+                    <th>Email</th>
+                    <th>Orders</th>
+                    <th class="text-end">Revenue Contributed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in per_admin %}
+                <tr>
+                    <td>
+                        {% if row.admin_name %}
+                            <strong>{{ row.admin_name }}</strong>
+                        {% else %}
+                            <span class="text-danger">Legacy / Unknown</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ row.admin_email or '—' }}</td>
+                    <td><span class="badge bg-secondary">{{ row.order_count or 0 }}</span></td>
+                    <td class="text-end"><strong class="text-success">₹{{ "{:,.0f}".format(row.admin_revenue or 0) }}</strong></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">No paid revenue data available yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3 small text-muted">
+    Revenue attributed to the admin who owns the sold product. Only paid orders counted.
+</div>
+{% endblock %}

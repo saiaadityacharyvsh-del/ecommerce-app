@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed - SmartCart{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <!-- Back link -->
+    <div class="mb-3">
+      <a href="/user/my-orders" class="text-decoration-none fw-medium">
+        &larr; Back to My Orders
+      </a>
+    </div>
+
+    <div class="card card-soft shadow-sm">
+      <div class="card-body p-4 p-md-5">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+          <div class="display-4 text-success mb-2">✓</div>
+          <h2 class="h3 text-success mb-1">Your Order is Confirmed!</h2>
+          <p class="text-muted mb-0">Thank you for shopping with <strong>SmartCart</strong>.</p>
+        </div>
+
+        <!-- Status Banner -->
+        {% set st = (order.status or 'pending')|lower %}
+        {% if st == 'cancelled' %}
+        <div class="alert alert-danger text-center py-2 mb-4">
+          <strong>This order has been cancelled.</strong>
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+          <!-- Order Details -->
+          <div class="col-md-5">
+            <h6 class="text-uppercase text-muted small mb-2">Order Details</h6>
+            <ul class="list-group list-group-flush border rounded-3">
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Order ID</span>
+                <strong>#{{ order.order_id }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Payment ID</span>
+                <strong class="text-break">{{ order.razorpay_payment_id }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Amount Paid</span>
+                <strong class="text-success">₹{{ "%.2f"|format(order.amount|float) }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Status</span>
+                <span class="badge {% if st == 'cancelled' %}bg-danger{% else %}bg-success{% endif %}">
+                  {{ order.status or 'Pending' }}
+                </span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Date</span>
+                <strong>{{ order.created_at }}</strong>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Shipping Address -->
+          <div class="col-md-7">
+            <h6 class="text-uppercase text-muted small mb-2">Shipping Address</h6>
+            {% if shipping_address %}
+            <div class="p-3 bg-light border rounded-3 small" style="line-height: 1.65;">
+              <strong>{{ shipping_address.get('name', '') }}</strong><br>
+              {{ shipping_address.get('phone', '') }}<br>
+              {% set addr = shipping_address.get('address', '') %}
+              {% set land = shipping_address.get('landmark', '') %}
+              {% if addr %}{{ addr }}{% if land %}, {{ land }}{% endif %}{% elif land %}{{ land }}{% endif %}<br>
+              {{ shipping_address.get('city', '') }}{% if shipping_address.get('district') %}, {{ shipping_address.get('district') }}{% endif %},
+              {{ shipping_address.get('state', '') }} - {{ shipping_address.get('pincode', '') }}<br>
+              {{ shipping_address.get('country', 'India') }}
+            </div>
+            {% else %}
+            <div class="text-muted small p-3 border rounded-3 bg-light">
+              Shipping address not recorded for this order.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="mt-4 pt-3 border-top">
+          <h6 class="text-uppercase text-muted small mb-3">Order Summary</h6>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Product</th>
+                  <th class="text-center" style="width: 80px;">Qty</th>
+                  <th class="text-end" style="width: 110px;">Price (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for it in items %}
+                <tr>
+                  <td>{{ it.product_name }}</td>
+                  <td class="text-center">{{ it.quantity }}</td>
+                  <td class="text-end">{{ it.price }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap gap-2 justify-content-end mt-4 pt-3 border-top">
+          <a href="/user/my-orders" class="btn btn-outline-secondary btn-sm px-3">
+            Back to My Orders
+          </a>
+          <a href="/user/products" class="btn btn-primary btn-sm px-3">
+            Continue Shopping
+          </a>
+          <a href="/user/download-invoice/{{ order.order_id }}" class="btn btn-success btn-sm px-3">
+            Download Invoice (PDF)
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

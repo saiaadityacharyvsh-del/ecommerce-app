@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Complete Payment - MyShop{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-6 col-lg-8">
+    <div class="card card-soft p-4 text-center">
+      <div class="mb-4">
+        <span class="display-6 text-primary">&#128179;</span>
+      </div>
+      <h1 class="h4 mb-3">Complete Your Payment</h1>
+
+      {% if selected_address %}
+      <div class="card bg-light p-3 text-start mb-4">
+        <h5 class="mb-2">
+          <span class="me-1">&#128205;</span> Shipping To
+        </h5>
+        <address class="mb-0 text-muted" style="font-style: normal;">
+          <strong>{{ selected_address.name }}</strong><br>
+          {{ selected_address.address }}{% if selected_address.landmark %}, {{ selected_address.landmark }}{% endif %}<br>
+          {{ selected_address.city }}{% if selected_address.district %}, {{ selected_address.district }}{% endif %}<br>
+          {{ selected_address.state }}{% if selected_address.pincode %} - {{ selected_address.pincode }}{% endif %}{% if selected_address.country %}, {{ selected_address.country }}{% endif %}<br>
+          Phone: {{ selected_address.phone }}
+        </address>
+      </div>
+      {% endif %}
+
+      <div class="mb-4">
+        <span class="text-muted">Total Amount</span>
+        <div class="display-6 fw-bold text-primary">₹{{ amount }}</div>
+      </div>
+
+      <button id="rzp-button" class="btn btn-primary btn-lg w-100 mb-3">
+        <span class="me-2">&#128179;</span> Pay Now
+      </button>
+      <p class="text-muted small mb-0">Secure payment powered by Razorpay</p>
+    </div>
+
+    <div id="payment-loading" class="d-none mt-3">
+      <div class="d-flex align-items-center justify-content-center gap-2 text-muted">
+        <div class="spinner-border spinner-border-sm" role="status"></div>
+        <span>Processing your payment...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+(function() {
+  var options = {
+    "key": "{{ key_id }}",
+    "amount": {{ amount * 100 }},
+    "currency": "INR",
+    "name": "SmartCart",
+    "description": "Order Payment",
+    "order_id": "{{ order_id }}",
+    "handler": function (response){
+        var form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/verify-payment";
+
+        var fields = {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+        };
+
+        for (var name in fields) {
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = name;
+            input.value = fields[name];
+            form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    },
+    "prefill": {
+      "name": "{{ session.get('user_name', '') }}"
+    },
+    "theme": {
+      "color": "#0d6efd"
+    }
+  };
+
+  var rzp = new Razorpay(options);
+  var loadingEl = document.getElementById('payment-loading');
+
+  rzp.on('payment.failed', function (response) {
+    loadingEl.classList.add('d-none');
+    var msg = response.error && response.error.description
+      ? response.error.description
+      : 'Please try again.';
+    alert('Payment failed: ' + msg);
+  });
+
+  document.getElementById('rzp-button').onclick = function(e){
+    loadingEl.classList.remove('d-none');
+    rzp.open();
+    e.preventDefault();
+  };
+})();
+</script>
+{% endblock %}
