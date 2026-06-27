@@ -22,6 +22,7 @@ MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'True').lower() == 'true'
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
 MAIL_TIMEOUT = int(os.getenv('MAIL_TIMEOUT', 10))
+MAIL_ENABLED = os.getenv('MAIL_ENABLED', 'True').lower() == 'true'
 OTP_FALLBACK_ENABLED = os.getenv('OTP_FALLBACK_ENABLED', 'True').lower() == 'true'
 
 # Razorpay Configuration

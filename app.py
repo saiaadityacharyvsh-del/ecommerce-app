@@ -242,6 +242,10 @@ def ensure_superadmin_table():
 
 
 def send_otp_email(email, otp):
+    if not config.MAIL_ENABLED:
+        app.logger.warning("OTP email skipped because MAIL_ENABLED is false.")
+        return False
+
     if not config.MAIL_USERNAME or not config.MAIL_PASSWORD:
         app.logger.warning("OTP email skipped because SMTP credentials are missing.")
         return False
