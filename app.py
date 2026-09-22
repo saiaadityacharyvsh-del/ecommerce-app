@@ -27,6 +27,16 @@ RAZORPAY_KEY_SECRET = config.RAZORPAY_KEY_SECRET
 
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
+
+def razorpay_credentials_configured():
+    """Return whether Razorpay credentials have been configured beyond sample values."""
+    sample_prefixes = ('your_', 'your-', 'placeholder')
+    credentials = (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
+    return all(
+        credential and not credential.strip().lower().startswith(sample_prefixes)
+        for credential in credentials
+    )
+
 app.config.update(
     MAIL_SERVER=config.MAIL_SERVER,
     MAIL_PORT=config.MAIL_PORT,
@@ -859,12 +869,17 @@ def forgot_password():
     cursor.close()
     conn.close()
 
-    # Do not reveal whether the email exists.
     if admin:
         otp = str(random.randint(100000, 999999))
-        send_otp_email(email, otp)
+        session['password_reset_otp'] = otp
+        session['password_reset_email'] = email
+        if send_otp_email(email, otp):
+            flash('If the email exists, a reset link/OTP has been sent to your inbox.', 'success')
+        else:
+            flash('Could not send reset email. Please check email configuration or try again later.', 'danger')
+    else:
+        flash('If the email exists, a reset link/OTP has been sent to your inbox.', 'success')
 
-    flash('If the email exists, a reset link/OTP has been sent to your inbox.', 'success')
     return redirect('/admin-login')
 
 
@@ -1797,6 +1812,11 @@ def user_pay():
 
     session['pending_order_items'] = selected_items
 
+    if not razorpay_credentials_configured():
+        app.logger.error("Razorpay payment order was requested without configured API credentials.")
+        flash("Online payments are temporarily unavailable. Please contact support.", "danger")
+        return redirect('/user/checkout')
+
     razorpay_amount = int(total_amount * 100)  # convert to paise
     try:
         razorpay_order = razorpay_client.order.create({
@@ -1806,6 +1826,7 @@ def user_pay():
         })
         session['razorpay_order_id'] = razorpay_order['id']
     except Exception:
+        app.logger.exception("Unable to create Razorpay payment order")
         flash("Unable to create payment order right now. Please try again later.", "danger")
         return redirect('/user/checkout')
 
@@ -2144,11 +2165,14 @@ def setup_products_fk():
     flash("Products table updated with admin_id foreign key + old products assigned to current admin!", "success")
     return redirect('/admin/dashboard')
 
+# These must run when Gunicorn imports ``app`` in production, not only when
+# this file is launched directly with ``python app.py``.
+initialize_database()
+os.makedirs(os.path.join('static', 'upload', 'product_images'), exist_ok=True)
+os.makedirs(os.path.join('static', 'upload', 'profile_pics'), exist_ok=True)
+
 
 if __name__ == '__main__':
-    initialize_database()
-    os.makedirs(os.path.join('static', 'upload', 'product_images'), exist_ok=True)
-    os.makedirs(os.path.join('static', 'upload', 'profile_pics'), exist_ok=True)
     app.run(
         host='0.0.0.0',
         port=int(os.getenv('PORT', 5000)),
